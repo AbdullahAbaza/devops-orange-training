@@ -1,0 +1,41 @@
+docker-compose up -d
+
+docker exec -it mysql-db mysql -u root -p
+
+#password : rootpass
+
+
+CREATE DATABASE irs_data;
+
+USE irs_data;
+
+CREATE TABLE taxpayers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    age INT,
+    state VARCHAR(50)
+);
+
+CREATE TABLE returns (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    taxpayer_id INT,
+    year INT,
+    tax_paid DECIMAL(10, 2),
+    refund DECIMAL(10, 2),
+    filing_type VARCHAR(50),
+    FOREIGN KEY (taxpayer_id) REFERENCES taxpayers(id)
+);
+
+
+INSERT INTO taxpayers (name, age, state) VALUES
+('John Doe', 35, 'California'),
+('Jane Smith', 42, 'Texas');
+
+INSERT INTO returns (taxpayer_id, year, tax_paid, refund, filing_type) VALUES
+(1, 2023, 15000, 2000, 'individual'),
+(2, 2023, 50000, 10000, 'corporate');
+
+
+exit
+
+docker compose restart
