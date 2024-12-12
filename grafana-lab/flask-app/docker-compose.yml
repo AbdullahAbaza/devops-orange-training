@@ -1,5 +1,11 @@
 version: '3.8'
 
+volumes:
+  mysql-data:
+
+networks:
+  grafana-lab-net:
+  
 services:
   flask-app:
     build: .
@@ -11,8 +17,10 @@ services:
       MYSQL_USER: irs_user
       MYSQL_PASSWORD: password123
       MYSQL_DATABASE: irs_data
+    
     depends_on:
       - mysql-db
+    command: ["sh", "-c", "until nc -z mysql-db 3306; do echo 'Waiting for MySQL...'; sleep 2; done; python generate_data.py && python app.py"]
 
   mysql-db:
     image: mysql:5.7
@@ -26,6 +34,4 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-
-volumes:
-  mysql-data:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
